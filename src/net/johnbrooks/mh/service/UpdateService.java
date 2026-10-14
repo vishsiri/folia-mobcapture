@@ -1,21 +1,22 @@
-package net.johnbrooks.mh.managers;
+package net.johnbrooks.mh.service;
 
 import net.johnbrooks.mh.Main;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class UpdateManager {
+public class UpdateService {
     private static final String urlToMobCapture = "https://johnbrooks.net/spigot_plugins/downloads/1.13.1/MobCapture.jar";
 
     public static boolean isUpdateAvailable() {
-        int remoteSize = UpdateManager.getFileSize(urlToMobCapture);
-        int localSize = UpdateManager.getFileSize();
+        int remoteSize = UpdateService.getFileSize(urlToMobCapture);
+        int localSize = UpdateService.getFileSize();
 
         return remoteSize != localSize;
     }
@@ -23,7 +24,7 @@ public class UpdateManager {
     private static int getFileSize(String fileUrl) {
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(fileUrl);
+            URL url = URI.create(fileUrl).toURL();
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("HEAD");
             conn.getInputStream();
@@ -31,7 +32,9 @@ public class UpdateManager {
         } catch (IOException e) {
             return -1;
         } finally {
-            conn.disconnect();
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
     }
 

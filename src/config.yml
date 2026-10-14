@@ -1,25 +1,152 @@
-# What projectile catches the creature.
-Projectile Catcher: EGG
-# Cost Mode: [ NONE, ITEM, VAULT ]
-Cost Mode: ITEM
-# When in ITEM mode, a player must have this item to catch a creature.
-Cost Item: REDSTONE
-Cost Amount: 1
-# When in VAULT mode, a player must have at least this amount of money.
-Cost Vault: 100
-# In these worlds, you cannot capture or release creatures.
-Disabled Worlds: []
-# Should eggs take the color of the creature they belong to?
-Colored Eggs: true
-# Should we hook into Towny
-Towny Hook: false
-# Are you using GriefPrevention?
-GriefPrevention Hook: false
-# Allow capturing creatures with melee
-MeleeCapture: true
-# Require projectile to contain key metadata.
-Require Unique: false
-# With '/mobcapture spawn', a projectile will be spawned with these values (only with Require Unique enabled).
-Unique Display Name: '&6Mob Catcher'
-Unique Lore:
-  - '&3Shoot a mob with me!'
+# MobCapture configuration
+#
+# Text supports MiniMessage tags such as <gold>, <blue>, <bold>.
+# Legacy & color codes still work for old configs.
+
+# Log capture, release, protection-hook, projectile, and attribute decisions to console.
+debug: false
+
+capture:
+  # Allow players to capture by hitting mobs with the item.
+  melee: true
+
+  # Entity types that cannot be captured.
+  # Use Bukkit EntityType enum names, for example: ENDER_DRAGON, WITHER, WARDEN
+  blacklisted-entities:
+    - ENDER_DRAGON
+    - WITHER
+
+  # Require players to use configured capture item types.
+  # Give items with: /mobcapture spawn <type> [amount]
+  items:
+    enabled: true
+    default-type: basic
+
+    # Fallback projectile material when items.enabled is false.
+    # Common values: EGG, SNOWBALL, ARROW
+    projectile: EGG
+
+    # VANILLA: let Minecraft consume thrown projectiles normally; melee does not consume.
+    # NEVER: refund thrown capture items and never consume on melee.
+    # ON_ATTEMPT: consume when a valid capture attempt is made.
+    # ON_SUCCESS: consume only when capture succeeds.
+    consume-mode: VANILLA
+
+    types:
+      basic:
+        material: EGG
+        chance: 35
+        display-name: "<gold>Basic Capture Egg"
+        lore:
+          - "<gray>Type: <yellow>{type}"
+          - "<gray>Capture chance: <yellow>{chance}%"
+          - "<dark_gray>Right-click a mob to capture it."
+      rare:
+        material: EGG
+        chance: 65
+        display-name: "<aqua>Rare Capture Egg"
+        lore:
+          - "<gray>Type: <yellow>{type}"
+          - "<gray>Capture chance: <yellow>{chance}%"
+          - "<dark_gray>Right-click a mob to capture it."
+      master:
+        material: EGG
+        chance: 100
+        display-name: "<light_purple>Master Capture Egg"
+        lore:
+          - "<gray>Type: <yellow>{type}"
+          - "<gray>Capture chance: <yellow>{chance}%"
+          - "<dark_gray>Right-click a mob to capture it."
+
+cost:
+  # NONE, ITEM, or VAULT
+  mode: NONE
+
+  # Used when mode is ITEM.
+  item: REDSTONE
+  amount: 1
+
+  # Used when mode is VAULT.
+  vault: 100
+
+worlds:
+  # Worlds where capturing and releasing are disabled.
+  disabled: []
+
+features:
+  colored-eggs: true
+
+  # CombatPets-style capture sequence. The mob is captured on the final result frame.
+  # Capture chance, item consumption, and costs stay unchanged.
+  capture-animation:
+    enabled: true
+    # 2-40 progress updates. Higher values make the race smoother.
+    frames: 16
+    # 1-20 ticks between progress updates (20 ticks = 1 second).
+    frame-interval-ticks: 2
+    # 1-200 ticks to keep the final success/failure title visible.
+    result-stay-ticks: 50
+
+  # Lore shown on captured-entity spawn eggs.
+  # All values support MiniMessage tags (<gold>, <gradient:...>, etc.),
+  # legacy & codes (&6, &b, ...), and plain text.
+  # Placeholders: {entity} display name, {entity_type} enum name,
+  #               {health}, {max_health}, {tamed}, {color}, {effect}, {duration}
+  # Set any lore-* line to "" to disable that line.
+  captured-egg:
+    display-name: "<gold>Captured {entity}"
+    lore:
+      - "<aqua>Creature Type: <yellow>{entity_type}"
+      - "<aqua>Health: <yellow>{health}/{max_health}"
+    lore-baby: "<aqua>Age: <yellow>Baby"
+    lore-tamed: "<aqua>Tamed: <yellow>{tamed}"
+    lore-parrot-color: "<aqua>Color: <yellow>{color}"
+    lore-potion-effect: "<dark_purple>{effect} for {duration} seconds"
+
+hooks:
+  towny: false
+  grief-prevention: false
+  worldguard: false
+  # false = allow captured mobs to be released without Towny/GriefPrevention/WorldGuard checks.
+  release-protection: true
+
+messages:
+  prefix: "<yellow>MobCapture:</yellow> <blue>"
+  no-permission-command: "{prefix}You do not have permission to run this command."
+  info-author: "{prefix}This plugin was created by WiseHollow!"
+  info-profile: "<blue>Profile: <click:open_url:'https://www.spigotmc.org/members/wisehollow.14804/'><underlined>https://www.spigotmc.org/members/wisehollow.14804/</underlined></click>"
+  config-regenerated: "{prefix}Configuration has been regenerated and reloaded!"
+  config-reloaded: "{prefix}Configuration has been reloaded!"
+  capture-items-disabled: "{prefix}Capture item types are not enabled in the config."
+  player-only: "{prefix}Only players can spawn capture items."
+  unknown-capture-type: "{prefix}Unknown capture item type. Available: {types}"
+  capture-item-spawned: "{prefix}Spawned {amount}x {type} capture item."
+  capture-item-given: "{prefix}Gave {amount}x {type} capture item to {player}."
+  capture-item-received: "{prefix}You received {amount}x {type} capture item from {player}."
+  capture-item-required: "{prefix}You need a capture item to do that."
+  unknown-command: "{prefix}Unknown command. Use /mobcapture, /mobcapture spawn <type> [amount], /mobcapture give <player> <type> [amount], /mobcapture reload, or /mobcapture version."
+  invalid-number: "{prefix}Please enter a valid number."
+  update-available: "{prefix}<click:open_url:'https://goo.gl/yiWQnT'><underlined>Click here</underlined></click> to get the latest version of {plugin}!"
+  up-to-date: "{prefix}Everything is up-to-date."
+  version: "<blue>{plugin}'s current version: {version}"
+  update-status: "{prefix}{status}"
+  update-status-available: "Update is available."
+  update-status-current: "Everything is up-to-date."
+  no-permission-capture: "{prefix}You do not have permission to capture this creature."
+  capture-blacklisted-entity: "{prefix}You cannot capture {entity}."
+  no-permission-area: "{prefix}You do not have permission to capture creatures here."
+  capture-disabled-world: "{prefix}You cannot capture a creature in this world!"
+  capture-failed-chance: "{prefix}The creature broke free! <gray>({chance}% chance)"
+  capture-already-in-progress: "{prefix}A capture is already in progress."
+  capture-interrupted: "{prefix}The capture was interrupted before it could finish."
+  capture-animation-progress-title: "<yellow><bold>Capturing...</bold>"
+  capture-animation-progress-subtitle: "<green><bold>Success</bold> <dark_gray>→ <green>{success}% <gray>| <red>{failure}% <dark_gray>← <red><bold>Failure</bold>"
+  capture-animation-success-title: "<green><bold>Mob Captured!</bold>"
+  capture-animation-success-subtitle: "<gray>You captured <green>{entity}</green>!"
+  capture-animation-failure-title: "<red><bold>Capture Failed!</bold>"
+  capture-animation-failure-subtitle: "<gray>The creature broke free. <white>({chance}% chance)"
+  not-enough-cost: "{prefix}You do not have enough {cost}."
+  wallet-charged: "{prefix}[Wallet Charged: ${amount}]"
+  item-charged: "{prefix}[{item} Charged: {amount}]"
+  creature-released: "{prefix}{entity} successfully spawned!"
+  release-disabled-world: "{prefix}You cannot release a creature in this world!"

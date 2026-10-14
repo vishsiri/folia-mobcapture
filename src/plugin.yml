@@ -2,9 +2,10 @@ name: MobCapture
 version: 1.2.6
 author: WiseHollow
 main: net.johnbrooks.mh.Main
-api-version: '1.13'
+api-version: '26.2'
+folia-supported: true
 
-softdepend: [ Vault, GriefPrevention, Towny ]
+softdepend: [ Vault, GriefPrevention, Towny, WorldGuard ]
 
 permissions:
   MobCapture.Admin:
@@ -12,6 +13,9 @@ permissions:
     default: op
   MobCapture.Catch.*:
     description: Ability to capture all types of animals and monsters.
+    default: op
+  MobCapture.Catch.Use:
+    description: Ability to capture creatures.
     default: op
   MobCapture.Catch.Peaceful:
     description: Ability to capture animals.
@@ -22,10 +26,3 @@ permissions:
   MobCapture.NoCost:
     description: Capture creatures without a cost.
     default: op
-
-commands:
-  MobCapture:
-    description: Performs administrative tasks regarding MobCapture.
-    usage: /<command> reload|update|version|spawn
-    permission: MobCapture.admin
-    permission-message: You don't have <permission>
